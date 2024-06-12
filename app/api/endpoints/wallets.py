@@ -14,7 +14,10 @@ def read_wallets(skip: int = 0, limit: int = 10, db: Session = Depends(deps.get_
 
 @router.get("/{user_id}", response_model=list[schemas.WalletBase])
 def read_wallets(user_id: int, skip: int = 0, limit: int = 10, db: Session = Depends(deps.get_db)):
-    wallets = db_repository.get_user_wallets(db, user_id, skip=skip, limit=limit)
+    user = db_repository.get_user(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    wallets = db_repository.get_user_wallets(db, user.id, skip=skip, limit=limit)
     return wallets
 
 
